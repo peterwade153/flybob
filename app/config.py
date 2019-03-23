@@ -11,7 +11,7 @@ class Config(object):
 	DEBUG = False
 	TESTING = False
 	SECRET_KEY = os.getenv('SECRET_KEY')
-	SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+	SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
 
 class ProductionConfig(Config):
 	DEBUG = False
@@ -27,7 +27,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
 	TESTING = True
 	DEBUG=True
-	SQLALCHEMY_DATABASE_URI = "postgresql://@localhost/testflybob"
+	SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app_root, 'test.db')
 
 app_configuration = {
     'production': ProductionConfig,
