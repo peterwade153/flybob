@@ -7,6 +7,7 @@ from functools import wraps
 from flask import request, jsonify
 
 from app.models.user import User
+from app.models.token_blacklist import TokenBlacklist
 
 
 def encode_auth_token(user_id):
@@ -27,19 +28,6 @@ def encode_auth_token(user_id):
     except Exception as e:
         return(f"an error {e} occurred while encoding the token")
 
-def decode_auth_token(auth_token):
-    """
-    Decode the authentication token
-    """
-
-    try:
-        payload = jwt.decode(auth_token, os.getenv('SECRET_KEY'))
-        return payload['sub']
-    except jwt.ExpiredSignature:
-        return (f"Token  expired, please log in again.")
-    except jwt.InvalidTokenError:
-        return (f"Invalid token, please log in again")
-
 def token_required(f):
 
     @wraps(f)
@@ -51,6 +39,14 @@ def token_required(f):
         if not token:
             return jsonify({
                 'message' : 'Token missing, please login to get an access_token',}), 403
+        
+        #check if token is not blacklisted
+        is_blacklisted = TokenBlacklist.get_by(token = token)
+        if is_blacklisted:
+            return jsonify({
+                'message' : 'Invalid token, please login!'
+            }), 403
+
         try:
             payload = jwt.decode(token, os.getenv('SECRET_KEY'))
             current_user = payload['sub']
@@ -60,7 +56,6 @@ def token_required(f):
             return jsonify({'message' : 'Invalid token:'}), 403
 
         return f(current_user, *args, **kwargs)
-    
     return decorate
 
 def admin_required(f):

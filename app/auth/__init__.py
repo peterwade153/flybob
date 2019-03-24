@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from app.auth.views import RegisterUserView, LoginUserView, UserPassportphotoView
+from app.auth.views import RegisterUserView, LoginUserView, UserPassportphotoView, LogoutView
 
 auth_blueprint = Blueprint('auth', __name__, url_prefix='/api/v1')
 
@@ -17,4 +17,9 @@ auth_blueprint.add_url_rule('/auth/login',
 user_passportphoto = UserPassportphotoView.as_view('user_photo')
 auth_blueprint.add_url_rule('/auth/upload', 
                             view_func=user_passportphoto,
+                            methods=['POST'])
+
+user_logout = LogoutView.as_view('logout_user')
+auth_blueprint.add_url_rule('/auth/logout', 
+                            view_func=user_logout,
                             methods=['POST'])
