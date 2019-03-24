@@ -5,7 +5,7 @@ from app import app
 from app.models.base import db
 
 
-class AuthTestCase(unittest.TestCase):
+class AuthRegisterTestCase(unittest.TestCase):
     
 
     def setUp(self):
@@ -47,5 +47,3 @@ class AuthTestCase(unittest.TestCase):
         reg = self.app.post('/api/v1/auth/register', data=json.dumps(users_data), 
                             content_type='application/json')
         self.assertEqual(reg.status_code, 400)
-
-
