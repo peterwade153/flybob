@@ -27,7 +27,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
 	TESTING = True
 	DEBUG=True
-	SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app_root, 'test.db')
+	SQLALCHEMY_DATABASE_URI = os.getenv('TEST_DATABASE_URL')
 
 app_configuration = {
     'production': ProductionConfig,

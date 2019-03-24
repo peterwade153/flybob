@@ -6,8 +6,9 @@ from flask.views import MethodView
 import cloudinary.uploader
 
 from app.models.user import User
+from app.models.token_blacklist import TokenBlacklist
 from utils.validation import validate_email, validate_password, allowed_image_extensions
-from utils.auth_token import encode_auth_token, decode_auth_token, token_required
+from utils.auth_token import encode_auth_token, token_required
 
 
 class RegisterUserView(MethodView):
@@ -69,7 +70,6 @@ class LoginUserView(MethodView):
     params: Email, Password
     """
 
-
     def post(self):
         data = request.get_json()
         email = data.get('email')
@@ -105,6 +105,30 @@ class LoginUserView(MethodView):
             logging.error(f"error :-> {e}")
             return jsonify({
                 'messsage' : 'Login failed, please try again',
+                'status' : 'Failed'
+            }), 400
+
+
+class LogoutView(MethodView):
+    """
+    Logs out user
+    """
+    decorators = [token_required]
+
+    def post(self, current_user):
+        token = request.headers['Authorization']
+
+        try:
+            new_blacklist_token = TokenBlacklist(token=token)
+            new_blacklist_token.save()
+            return jsonify({
+                'message':'Logged out successfully',
+                'status':'Success'
+            }), 200
+        except Exception as e:
+            logging.error(f"An error:-> {e} occured")
+            return jsonify({
+                'message':'Action failed, please try again',
                 'status' : 'Failed'
             }), 400
 
