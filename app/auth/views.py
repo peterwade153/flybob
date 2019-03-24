@@ -3,10 +3,11 @@ import logging
 
 from flask import request, jsonify
 from flask.views import MethodView
+import cloudinary.uploader
 
 from app.models.user import User
-from utils.validation import validate_email, validate_password
-from utils.auth_token import encode_auth_token, decode_auth_token
+from utils.validation import validate_email, validate_password, allowed_image_extensions
+from utils.auth_token import encode_auth_token, decode_auth_token, token_required
 
 
 class RegisterUserView(MethodView):
@@ -68,6 +69,7 @@ class LoginUserView(MethodView):
     params: Email, Password
     """
 
+
     def post(self):
         data = request.get_json()
         email = data.get('email')
@@ -103,5 +105,44 @@ class LoginUserView(MethodView):
             logging.error(f"error :-> {e}")
             return jsonify({
                 'messsage' : 'Login failed, please try again',
+                'status' : 'Failed'
+            }), 400
+
+
+class UserPassportphotoView(MethodView):
+    """
+    User upload passport photo to cloudinary
+    params: image
+    """
+
+    decorators = [token_required]
+
+    def post(self, current_user):
+
+        image_file = request.files['image']
+        if not image_file:
+            return jsonify({
+                'message' : 'No image was uploaded',
+                'status' : 'Failed'
+            }), 400
+        if not allowed_image_extensions(image_file):
+            return jsonify({
+                'message' : 'Only images are allowed',
+                'status' : 'Failed'
+            }), 400
+        user = User.get(id=current_user)
+        try:
+            upload_res = cloudinary.uploader.upload(image_file)
+            stored_img_url = upload_res.get('url')
+            if stored_img_url:
+                user.update(passport_photo_url=stored_img_url)
+                return jsonify({
+                    'message':'Photo successfully uploaded',
+                    'status':'Success'
+                }), 200
+        except Exception as e:
+            logging.error(f"error: -> {e}")
+            return jsonify({
+                'message' : 'Passport photo upload failed, please try again',
                 'status' : 'Failed'
             }), 400
