@@ -61,9 +61,15 @@ def token_required(f):
 def admin_required(f):
 
     @wraps(f)
-    def admin_check(current_user, *args, **kwargs):
-        user_id = current_user
+    def admin_check(*args, **kwargs):
+        token = None
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization']
+
         try:
+            payload = jwt.decode(token, os.getenv('SECRET_KEY'))
+            user_id = payload['sub']
+
             user = User.get(id=user_id)
             if not user.role:
                 return jsonify({
