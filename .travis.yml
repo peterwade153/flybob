@@ -15,7 +15,7 @@ before_script:
   - psql -c "CREATE DATABASE testflybob;" -U postgres
 
 env:
-  - DATABASE_URL=postgresql://@localhost/testflybob SECRET_KEY=this-should-be-secret APP_SETTINGS=config.TestingConfig
+  - DATABASE_URL=postgresql://@localhost/testflybob SECRET_KEY=this-should-be-secret APP_SETTINGS=testing
 
 script:
   - nosetests
