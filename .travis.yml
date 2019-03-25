@@ -1,0 +1,21 @@
+language: python
+
+python:
+  - "3.6"  # 3.7
+
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+# command to run tests
+
+services:
+  - postgresql
+
+before_script:
+  - psql -c "CREATE DATABASE testflybob;" -U postgres
+
+env:
+  - DATABASE_URL=postgresql://@localhost/testflybob SECRET_KEY=this-should-be-secret APP_SETTINGS=testing
+
+script:
+  - nosetests

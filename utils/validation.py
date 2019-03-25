@@ -2,7 +2,6 @@ import os
 import re
 
 
-
 def validate_password(password):
     return re.match('^[A-Za-z0-9]{8,}', password)
 
