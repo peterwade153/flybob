@@ -8,7 +8,7 @@ import cloudinary.uploader
 from app.models.user import User
 from app.models.token_blacklist import TokenBlacklist
 from utils.validation import validate_email, validate_password, allowed_image_extensions
-from utils.auth_token import encode_auth_token, token_required
+from utils.auth_token import encode_auth_token, token_required, admin_required
 
 
 class RegisterUserView(MethodView):
@@ -53,7 +53,7 @@ class RegisterUserView(MethodView):
             return jsonify({
                 'message' : 'User successfully registered',
                 'status' : 'Success',
-                'access-token' : access_token.decode('UTF-8')
+                'access_token' : access_token.decode('UTF-8')
             }), 201
 
         except Exception as e:
@@ -169,4 +169,34 @@ class UserPassportphotoView(MethodView):
             return jsonify({
                 'message' : 'Passport photo upload failed, please try again',
                 'status' : 'Failed'
+            }), 400
+
+
+class UpdateUserRole(MethodView):
+    """
+    Updates user role
+    """
+    decorators = [token_required, admin_required]
+
+    def post(self, current_user, user_id):
+        user = User.get(id=user_id)
+        try:
+            if not user.role:
+                user.update(role=True)
+                return jsonify({
+                    'message': "User role upgraded to Admin.",
+                    'status' : "Success"
+                }), 200
+            #else down grade them to normal users
+            user.update(role=False)
+            return jsonify({
+                'message':"User role downgraded to normal user",
+                'status':'sucess'
+            }), 200
+            
+        except Exception as e:
+            logging.error(f"An error:-> {e} ocuured.")
+            return jsonify({
+                'message':'Role update failed, please try again.',
+                'status'  :'Failed'
             }), 400
