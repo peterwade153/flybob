@@ -18,4 +18,8 @@ env:
   - DATABASE_URL=postgresql://@localhost/testflybob SECRET_KEY=this-should-be-secret APP_SETTINGS=testing
 
 script:
-  - nosetests
+  - nosetests --with-coverage --cover-package=app
+
+after_success:
+  - coverage report
+  - coveralls

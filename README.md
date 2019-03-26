@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/peterwade153/flybob.svg?branch=master)](https://travis-ci.org/peterwade153/flybob)
+[![Coverage Status](https://coveralls.io/repos/github/peterwade153/flybob/badge.svg?branch=master)](https://coveralls.io/github/peterwade153/flybob?branch=master)
 # Flybob-API
 ---
 ## Description
