@@ -74,3 +74,8 @@ POST    |  api/v1/auth/register           |        Register user
 POST    |  api/v1/auth/login              |        Login user
 POST    |  api/v1/auth/logout             |        Logout user
 POST    |  api/v1/auth/upload             |        Upload passport photo
+POST    |  api/v1/flights                 |        Register a flight (Admin-only)
+GET     |  api/v1/flights                 |        Returns all flights
+PUT     |  api/v1/flights/<id>            |        Update flight data (Admin-only)
+DELETE  |  api/v1/flights/<id>            |        Delete a flight (Admin-only)
+GET     |  api/v1/flights/<id>            |        Return a flight
