@@ -11,7 +11,7 @@ from utils.auth_token import token_required, admin_required
 class RegisterFlightView(MethodView):
     """
     Admins register flights
-    params:name, origin, destination, departure, arrive, duration, status, aircraft
+    params:name, origin, destination, departure, arrive, duration, status, aircraft, capacity
     """
 
     decorators = [token_required, admin_required]
@@ -25,10 +25,11 @@ class RegisterFlightView(MethodView):
         destination = data.get('destination')
         departure = data.get('departure')
         arrive = data.get('arrive')
+        capacity = data.get('capacity')
         duration  = data.get('duration')
         status = data.get('status')
 
-        if not all([name, origin, destination, departure, arrive, duration, status, aircraft]):
+        if not all([name, origin, destination, departure, arrive, duration, status, aircraft, capacity]):
             return jsonify({
                 'message' : 'All fields name, origin, destination,' 
                 'departure, arrive, duration, status',
@@ -37,7 +38,7 @@ class RegisterFlightView(MethodView):
 
         try:
             new_flight = Flight(name=name, origin=origin, destination=destination, 
-                          departure=departure, arrive=arrive, duration=duration, 
+                          departure=departure, arrive=arrive, duration=duration, capacity=capacity,
                           aircraft=aircraft, status=status, created_by=current_user)
             new_flight.save()
             return jsonify({
@@ -54,7 +55,7 @@ class RegisterFlightView(MethodView):
 class UpdateDeleteFlightView(MethodView):
     """
     Admin update flight data
-    params: name, origin, destination, departure, arrive, duration, status, aircraft
+    params: name, origin, destination, departure, arrive, duration, status, aircraft, capacity
     """
     decorators = [token_required, admin_required]
 
@@ -67,7 +68,7 @@ class UpdateDeleteFlightView(MethodView):
                 'message':"Flight not found",
                 'status':'Failed'
             }), 404
-        fields = ['name', 'origin', 'destination', 'departure', 'arrive', 'duration', 'status', 'aircraft']
+        fields = ['name', 'origin', 'destination', 'departure', 'arrive', 'duration', 'status', 'aircraft', 'capacity']
         for field in data.keys():
             if field not in fields:
                 return jsonify({

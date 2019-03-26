@@ -24,7 +24,8 @@ class FlightTestCase(unittest.TestCase):
             "destination":"LGN-BST Boston",
             "departure": "2019-04-25T18:30:49-0300", 
             "arrive": "2019-04-26T18:30:49-0300", 
-            "duration":"8hrs", 
+            "duration":"8hrs",
+            "capacity":"200",
             "status":"scheduled", 
             "aircraft":"Boeing 8 max"
         }

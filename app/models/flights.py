@@ -12,6 +12,7 @@ class Flight(BaseMixin, db.Model):
     destination = db.Column(db.String(100), nullable=False)
     departure = db.Column(db.DateTime, nullable=False)
     arrive = db.Column(db.DateTime, nullable=False)
+    capacity = db.Column(db.Integer, nullable=False)
     aircraft = db.Column(db.String(100), nullable=False)
     duration = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(100), nullable=False)
@@ -20,13 +21,14 @@ class Flight(BaseMixin, db.Model):
     updated_on = db.Column(db.DateTime, default=datetime.datetime.now,
                            onupdate=datetime.datetime.now, nullable=False)
 
-    def __init__(self, name, origin, destination, departure, arrive, aircraft, duration, status, created_by):
+    def __init__(self, name, origin, destination, departure, capacity, arrive, aircraft, duration, status, created_by):
         self.name = name
         self.origin = origin
         self.destination = destination
         self.departure = departure
         self.arrive = arrive
         self.aircraft = aircraft
+        self.capacity = capacity
         self.duration = duration
         self.status = status
         self.created_by = created_by
@@ -40,7 +42,8 @@ class Flight(BaseMixin, db.Model):
                 'origin': self.origin, 
                 'destination':self.destination,
                 'departure': self.departure, 
-                'arrive': self.arrive, 
+                'arrive': self.arrive,
+                'capacity': self.capacity, 
                 'duration':self.duration, 
                 'status':self.status, 
                 'aircraft':self.aircraft,
