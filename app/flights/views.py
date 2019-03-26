@@ -76,8 +76,8 @@ class UpdateDeleteFlightView(MethodView):
                     'status':"Failed"
                 }), 400
         try:
-            for i, j in data.items():
-                setattr(flight, i, j)
+            for attr, value in data.items():
+                setattr(flight, attr, value)
                 flight.save()
             return jsonify({
                 'message':'Flight updated',
