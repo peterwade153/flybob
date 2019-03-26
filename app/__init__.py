@@ -9,6 +9,7 @@ from .config import app_configuration
 from app.models import db
 from app.auth import auth_blueprint
 from app.flights import flight_blueprint
+from app.reservations import reservations_blueprint
 
 
 app = Flask(__name__)
@@ -37,6 +38,7 @@ Cloud.config.update = ({
 #register blueprints
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(flight_blueprint)
+app.register_blueprint(reservations_blueprint)
 
 
 @app.route('/')
