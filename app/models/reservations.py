@@ -10,6 +10,7 @@ class Reservation(BaseMixin, db.Model):
     flight_id = db.Column(db.Integer, db.ForeignKey('flights.id'), nullable=False)
     flight = db.relationship('Flight', backref=db.backref('reservations', lazy='dynamic'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship('Flight', backref=db.backref('users', lazy='dynamic'))
     seats_booked = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String(50), nullable=False)
     booked_on = db.Column(db.DateTime, default=datetime.datetime.now, nullable=False)

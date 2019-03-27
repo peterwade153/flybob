@@ -2,9 +2,11 @@ import logging
 
 from flask import request, jsonify
 from flask.views import MethodView
+from sqlalchemy import func
 
 from app.models.reservations import Reservation
 from app.models.flights import Flight
+from app.models.base import db
 from utils.auth_token import token_required
 
 
@@ -34,8 +36,18 @@ class ReservationsView(MethodView):
             }), 404
         
         try:
+            if seats_booked > flight.capacity:
+                return jsonify({
+                    'message': 'Current seating capacity is '+str(flight.capacity),
+                    'status':'Failed'
+                }), 202
+            #update the flight capacity
+            new_flight_capacity = flight.capacity - int(seats_booked)
+            flight.update(capacity=new_flight_capacity)
+
             book = Reservation(flight_id=flight_id, seats_booked=seats_booked, user_id=current_user)
             book.save()
+
             return jsonify({
                 'message':'Reservation on '+flight.name+' made successfully!',
                 'status' : 'Success'
@@ -48,6 +60,20 @@ class ReservationsView(MethodView):
             }),400
     
     def get(self, current_user):
+
+        flight = request.args.get('flight', None)
+        booked_on = request.args.get('booked_on', None)
+        if flight and booked_on:
+            seats_booked = 0
+            booked_flights = Reservation.query.join(Flight).filter(func.date(Reservation.booked_on)==booked_on, 
+                                                                   Flight.name==flight)
+            for b in booked_flights:
+                results = seats_booked+b.seats_booked 
+            return jsonify({
+                'seats_booked': results,
+                'reservations':booked_flights.count()
+            }), 200
+        
         reservations = Reservation.get_all()
         return jsonify({
             'reservations' : [reservation.serialized_reservation() for reservation in reservations],
