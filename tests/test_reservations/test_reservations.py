@@ -46,6 +46,19 @@ class ReservationsTestCase(unittest.TestCase):
                     'Authorization':token})
         self.assertEqual(result.status_code, 201)
     
+    def test_add_reservations_with_no_seats_available(self):
+        res = self.app.post('/api/v1/auth/login', data=json.dumps(self.user_data),
+                        headers={'Content-Type':'application/json'})
+        token = json.loads(res.data.decode())['access_token']
+        book_data = {
+            'flight_id': 1,
+            'seats_booked': 244
+        }
+        result = self.app.post('/api/v1/reservations', data=json.dumps(book_data), headers={
+                    'Content-Type':'application/json',
+                    'Authorization':token})
+        self.assertEqual(result.status_code, 202)
+    
     def test_add_reservations_for_non_existant_flight(self):
         res = self.app.post('/api/v1/auth/login', data=json.dumps(self.user_data),
                         headers={'Content-Type':'application/json'})
@@ -144,3 +157,13 @@ class ReservationsTestCase(unittest.TestCase):
                     'Authorization':token})
         self.assertEqual(result.status_code, 400)
     
+    def test_get_reservations_made_on_specific_day(self):
+        res = self.app.post('/api/v1/auth/login', data=json.dumps(self.user_data),
+                        headers={'Content-Type':'application/json'})
+        token = json.loads(res.data.decode())['access_token']
+        self.app.post('/api/v1/reservations', data=json.dumps(self.reservation_data), headers={
+                    'Content-Type':'application/json','Authorization':token})
+        result = self.app.get('/api/v1/reservations/1', headers={
+                    'Content-Type':'application/json',
+                    'Authorization':token}, data={'flight':'KQ-FTK123', 'booked_on':'2019-04-25'})
+        self.assertEqual(result.status_code, 200)
