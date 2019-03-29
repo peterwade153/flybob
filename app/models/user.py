@@ -25,4 +25,4 @@ class User(BaseMixin, db.Model):
         self.role = role
     
     def __repr__(self):
-        return "<User :{}>".format(self.name)
+        return "<User :{}>".format(self.username)
