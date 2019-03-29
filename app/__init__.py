@@ -8,12 +8,6 @@ from celery import Celery
 from flask_mail import Mail
 import cloudinary as Cloud
 
-from .config import app_configuration
-from app.models import db
-from app.auth import auth_blueprint
-from app.flights import flight_blueprint
-from app.reservations import reservations_blueprint
-
 
 app = Flask(__name__)
 
@@ -22,6 +16,9 @@ app_root = os.path.join(os.path.dirname(__file__), '..')
 dotenv_path = os.path.join(app_root, '.env')
 
 load_dotenv(dotenv_path)
+
+
+from .config import app_configuration
 
 app_environment = os.getenv('APP_SETTINGS')
 app.config.from_object(app_configuration[app_environment])
@@ -37,8 +34,9 @@ app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')  # enter your email her
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')  # enter your email here
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD') # enter your password here
 
-#connecting sqlalchemy object to the app
-db.init_app(app)
+#mail config
+mail = Mail(app)
+
 
 #cloudinary config
 Cloud.config.update = ({
@@ -47,13 +45,26 @@ Cloud.config.update = ({
     'api_secret': os.getenv('CLOUDINARY_API_SECRET')
 })
 
+
+from app.models import db
+from app.auth import auth_blueprint
+from app.flights import flight_blueprint
+from app.reservations import reservations_blueprint
+from app.tasks import flight_reminder
+from app import celery_config
+
+
+#connecting sqlalchemy object to the app
+db.init_app(app)
+
+
 #register blueprints
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(flight_blueprint)
 app.register_blueprint(reservations_blueprint)
 
 
-#celery config
+
 def make_celery(app):
     celery = Celery(
         app.import_name,
@@ -61,6 +72,7 @@ def make_celery(app):
         broker=app.config['CELERY_BROKER_URL']
     )
     celery.conf.update(app.config)
+    celery.config_from_object(celery_config)
 
     class ContextTask(celery.Task):
         def __call__(self, *args, **kwargs):
@@ -71,16 +83,6 @@ def make_celery(app):
     return celery
 
 celery = make_celery(app)
-
-CELERYBEAT_SCHEDULE = {
-        'run-every-1-minute': {
-            'task': 'tasks.flight_reminder',
-            'schedule': timedelta(seconds=60)
-        },
-    }
-
-#mail config
-mail = Mail(app)
 
 
 @app.route('/')

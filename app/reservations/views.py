@@ -68,9 +68,9 @@ class ReservationsView(MethodView):
             booked_flights = Reservation.query.join(Flight).filter(func.date(Reservation.booked_on)==booked_on, 
                                                                    Flight.name==flight)
             for b in booked_flights:
-                results = seats_booked+b.seats_booked 
+                seats_booked =+b.seats_booked 
             return jsonify({
-                'seats_booked': results,
+                'seats_booked': seats_booked,
                 'reservations':booked_flights.count()
             }), 200
         

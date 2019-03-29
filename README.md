@@ -33,7 +33,8 @@ CREATE DATABASE flybobdb;
 
 ### Environment variables
 Set up cloudinary account, its the service used for hosting the user images.
-Add these variables replacing then with actual values.
+Ensure redis is installed locally.
+Add these variables replacing then with actual values or use the `.env_sample` as save it as a `.env`
 <pre>
 $ export SECRET_KEY='to something secret'
 $ export APP_SETTINGS='development'
@@ -41,6 +42,11 @@ $ export DATABASE_URL='postgresql://your-username:your-password@localhost/flybob
 $ export CLOUDINARY_CLOUD_NAME = 'cloud-name'
 $ export CLOUDINARY_API_KEY = 'api-key'
 $ export CLOUDINARY_API_SECRET = 'api-secret'
+$ export CELERY_BROKER_URL = 'broker url'
+$ export CELERY_RESULT_BACKEND = 'backend'
+$ export MAIL_PASSWORD = 'enter password here'
+$ export MAIL_DEFAULT_SENDER = 'enter your email here'
+$ export MAIL_USERNAME = 'enter your email here'
 </pre>
 Alterbatively these variables can be placed in a `.env` file which can be added to the root folder.
 
@@ -65,6 +71,19 @@ $ nosetests
 ### Running application
 <pre>
 $ python run.py
+</pre>
+#### Running the flight remainder task via email functionlity 
+To start redis
+<pre>
+$ redis-server
+</pre>
+To run the celery beat
+<pre>
+celery -A app.celery beat -l info
+</pre>
+To run the celery worker
+<pre>
+celery -A app.celery worker -l info
 </pre>
 The use a tool like postman to access the endpoints below.
 ### Endpoints
