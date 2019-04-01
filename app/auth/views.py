@@ -3,6 +3,7 @@ import logging
 
 from flask import request, jsonify
 from flask.views import MethodView
+from werkzeug.security import check_password_hash
 import cloudinary.uploader
 
 from app.models.user import User
@@ -93,14 +94,17 @@ class LoginUserView(MethodView):
                     'message' : 'User not registered, please register',
                     'status' : 'Failed'
                 }), 404
-            else:
-                #generate  access token
-                access_token = encode_auth_token(user_id=user.id)
-                return jsonify({
-                    'message' : 'Logged in successfully',
-                    'status' : 'Success',
-                    'access_token' : access_token.decode('UTF-8')
-                }), 200
+            if not check_password_hash(user.password, password):
+                return jsonify({'Message':'An error occured,please try again!',
+				                'Status':'Failed'}), 401
+
+            #generate  access token
+            access_token = encode_auth_token(user_id=user.id)
+            return jsonify({
+                'message' : 'Logged in successfully',
+                'status' : 'Success',
+                'access_token' : access_token.decode('UTF-8')
+            }), 200
         except Exception as e:
             logging.error(f"error :-> {e}")
             return jsonify({

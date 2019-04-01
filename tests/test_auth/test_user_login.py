@@ -56,3 +56,11 @@ class AuthLoginTestCase(unittest.TestCase):
         reg = self.app.post('/api/v1/auth/login', data=json.dumps(users_data), 
                             content_type='application/json')
         self.assertEqual(reg.status_code, 400)
+    
+    def tests_user_login_with_invalid_password(self):
+        reg = self.register_user()
+        self.assertEqual(reg.status_code, 201)
+        users_data = {'email':'john123@john.com', 'password':'10343443345'}
+        res = self.app.post('/api/v1/auth/login', data=json.dumps(users_data), 
+                            content_type='application/json')
+        self.assertEqual(res.status_code, 401)
