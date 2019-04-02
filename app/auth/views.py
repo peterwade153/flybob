@@ -167,22 +167,16 @@ class UpdateUserRole(MethodView):
 
     def post(self, current_user, user_id):
         user = User.get(id=user_id)
-        try:
-            if not user.role:
-                user.update(role=True)
-                return jsonify({
-                    'message': "User role upgraded to Admin.",
-                    'status' : "Success"
-                }), 200
-            #else down grade them to normal users
-            user.update(role=False)
+
+        if not user.role:
+            user.update(role=True)
             return jsonify({
-                'message':"User role downgraded to normal user",
-                'status':'sucess'
+                'message': "User role upgraded to Admin.",
+                'status' : "Success"
             }), 200
-            
-        except:
-            return jsonify({
-                'message':'Role update failed, please try again.',
-                'status'  :'Failed'
-            }), 400
+        #else down grade them to normal users
+        user.update(role=False)
+        return jsonify({
+            'message':"User role downgraded to normal user",
+            'status':'sucess'
+        }), 200
