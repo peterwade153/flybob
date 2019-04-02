@@ -1,5 +1,3 @@
-import logging
-
 from flask import request, jsonify
 from flask.views import MethodView
 from sqlalchemy import func
@@ -52,8 +50,7 @@ class ReservationsView(MethodView):
                 'message':'Reservation on '+flight.name+' made successfully!',
                 'status' : 'Success'
             }), 201
-        except Exception as e:
-            logging.error(f"Error:-> {e} ocurred!")
+        except:
             return jsonify({
                 'message': "Flight reservation failed, please try again!",
                 'status':"Failed"
@@ -109,11 +106,10 @@ class ReservationGetUpdateView(MethodView):
                 setattr(reservation, attr, value)
                 reservation.save()
             return jsonify({
-                'message' : 'Reseravtion updated',
+                'message' : 'Reservation updated',
                 'status' : 'Success'
             }), 200
-        except Exception as e:
-            logging.error(f"error:-> {e} ocurred!")
+        except:
             return jsonify({
                 'message': "Reservation update failed, please try again!",
                 'status':"Failed"

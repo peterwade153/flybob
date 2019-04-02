@@ -1,4 +1,3 @@
-import logging
 import json
 
 from flask import request, jsonify
@@ -45,8 +44,7 @@ class RegisterFlightView(MethodView):
                 'message':'Flight '+name+' to '+destination+' registered.',
                 'status':' Success'
                 }), 201
-        except Exception as e:
-            logging.error(f"error:-> {e} occured!")
+        except:
             return jsonify({
                 'message': 'Regstration failed, please try again.'
             }), 400
@@ -83,8 +81,7 @@ class UpdateDeleteFlightView(MethodView):
                 'message':'Flight updated',
                 'status':'Success'
             }), 200
-        except Exception as e:
-            logging.error(f"error:-> {e} occured!")
+        except:
             return jsonify({
                 'message': "Flight update failed, please try again!",
                 'status':"Failed"
@@ -104,8 +101,7 @@ class UpdateDeleteFlightView(MethodView):
                 'message':'Flight deleted',
                 'status':'Success'
             }), 200
-        except Exception as e:
-            logging.error(f"error:-> {e} occured!")
+        except:
             return jsonify({
                 'message': "Flight delete failed, please try again!",
                 'status':"Failed"

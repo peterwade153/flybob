@@ -1,5 +1,4 @@
 import os
-import logging
 
 from flask import request, jsonify
 from flask.views import MethodView
@@ -57,8 +56,7 @@ class RegisterUserView(MethodView):
                 'access_token' : access_token.decode('UTF-8')
             }), 201
 
-        except Exception as e:
-            logging.error(f'An error {e} has occured')
+        except:
             return jsonify({
                 'message' : 'Registration failed. Please try again',
                 'status' : 'Failed'
@@ -105,8 +103,7 @@ class LoginUserView(MethodView):
                 'status' : 'Success',
                 'access_token' : access_token.decode('UTF-8')
             }), 200
-        except Exception as e:
-            logging.error(f"error :-> {e}")
+        except:
             return jsonify({
                 'messsage' : 'Login failed, please try again',
                 'status' : 'Failed'
@@ -129,8 +126,7 @@ class LogoutView(MethodView):
                 'message':'Logged out successfully',
                 'status':'Success'
             }), 200
-        except Exception as e:
-            logging.error(f"An error:-> {e} occured")
+        except:
             return jsonify({
                 'message':'Action failed, please try again',
                 'status' : 'Failed'
@@ -168,8 +164,7 @@ class UserPassportphotoView(MethodView):
                     'message':'Photo successfully uploaded',
                     'status':'Success'
                 }), 200
-        except Exception as e:
-            logging.error(f"error: -> {e}")
+        except:
             return jsonify({
                 'message' : 'Passport photo upload failed, please try again',
                 'status' : 'Failed'
@@ -198,8 +193,7 @@ class UpdateUserRole(MethodView):
                 'status':'sucess'
             }), 200
             
-        except Exception as e:
-            logging.error(f"An error:-> {e} ocuured.")
+        except:
             return jsonify({
                 'message':'Role update failed, please try again.',
                 'status'  :'Failed'
