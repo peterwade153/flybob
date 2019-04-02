@@ -35,19 +35,14 @@ class RegisterFlightView(MethodView):
                 'status': 'Failed'
             }), 400
 
-        try:
-            new_flight = Flight(name=name, origin=origin, destination=destination, 
-                          departure=departure, arrive=arrive, duration=duration, capacity=capacity,
-                          aircraft=aircraft, status=status, created_by=current_user)
-            new_flight.save()
-            return jsonify({
-                'message':'Flight '+name+' to '+destination+' registered.',
-                'status':' Success'
-                }), 201
-        except:
-            return jsonify({
-                'message': 'Regstration failed, please try again.'
-            }), 400
+        new_flight = Flight(name=name, origin=origin, destination=destination, 
+                        departure=departure, arrive=arrive, duration=duration, capacity=capacity,
+                        aircraft=aircraft, status=status, created_by=current_user)
+        new_flight.save()
+        return jsonify({
+            'message':'Flight '+name+' to '+destination+' registered.',
+            'status':' Success'
+            }), 201
 
 
 class UpdateDeleteFlightView(MethodView):
@@ -73,19 +68,15 @@ class UpdateDeleteFlightView(MethodView):
                     'message':" Unknown fields passed",
                     'status':"Failed"
                 }), 400
-        try:
-            for attr, value in data.items():
-                setattr(flight, attr, value)
-                flight.save()
-            return jsonify({
-                'message':'Flight updated',
-                'status':'Success'
-            }), 200
-        except:
-            return jsonify({
-                'message': "Flight update failed, please try again!",
-                'status':"Failed"
-            }),400
+        #update
+        for attr, value in data.items():
+            setattr(flight, attr, value)
+            flight.save()
+        return jsonify({
+            'message':'Flight updated',
+            'status':'Success'
+        }), 200
+
         
     def delete(self, current_user, id):
 
@@ -95,17 +86,12 @@ class UpdateDeleteFlightView(MethodView):
                 'message':"Flight not found",
                 'status':'Failed'
             }), 404
-        try:
-            flight.delete()
-            return jsonify({
-                'message':'Flight deleted',
-                'status':'Success'
-            }), 200
-        except:
-            return jsonify({
-                'message': "Flight delete failed, please try again!",
-                'status':"Failed"
-            }),400
+
+        flight.delete()
+        return jsonify({
+            'message':'Flight deleted',
+            'status':'Success'
+        }), 200
 
 
 class GetAllFlights(MethodView):

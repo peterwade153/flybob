@@ -85,29 +85,23 @@ class LoginUserView(MethodView):
                             'and email should be valid',
                 'status ' : 'Failed'
             }), 400
-        try:
-            user = User.get_by(email=email)
-            if not user:
-                return jsonify({
-                    'message' : 'User not registered, please register',
-                    'status' : 'Failed'
-                }), 404
-            if not check_password_hash(user.password, password):
-                return jsonify({'Message':'An error occured,please try again!',
-				                'Status':'Failed'}), 401
 
-            #generate  access token
-            access_token = encode_auth_token(user_id=user.id)
+        user = User.get_by(email=email)
+        if not user:
             return jsonify({
-                'message' : 'Logged in successfully',
-                'status' : 'Success',
-                'access_token' : access_token.decode('UTF-8')
-            }), 200
-        except:
-            return jsonify({
-                'messsage' : 'Login failed, please try again',
+                'message' : 'User not registered, please register',
                 'status' : 'Failed'
-            }), 400
+            }), 404
+        if not check_password_hash(user.password, password):
+            return jsonify({'Message':'An error occured,please try again!',
+                            'Status':'Failed'}), 401
+        #generate  access token
+        access_token = encode_auth_token(user_id=user.id)
+        return jsonify({
+            'message' : 'Logged in successfully',
+            'status' : 'Success',
+            'access_token' : access_token.decode('UTF-8')
+        }), 200
 
 
 class LogoutView(MethodView):
@@ -119,18 +113,12 @@ class LogoutView(MethodView):
     def post(self, current_user):
         token = request.headers['Authorization']
 
-        try:
-            new_blacklist_token = TokenBlacklist(token=token)
-            new_blacklist_token.save()
-            return jsonify({
-                'message':'Logged out successfully',
-                'status':'Success'
-            }), 200
-        except:
-            return jsonify({
-                'message':'Action failed, please try again',
-                'status' : 'Failed'
-            }), 400
+        new_blacklist_token = TokenBlacklist(token=token)
+        new_blacklist_token.save()
+        return jsonify({
+            'message':'Logged out successfully',
+            'status':'Success'
+        }), 200
 
 
 class UserPassportphotoView(MethodView):
@@ -179,22 +167,16 @@ class UpdateUserRole(MethodView):
 
     def post(self, current_user, user_id):
         user = User.get(id=user_id)
-        try:
-            if not user.role:
-                user.update(role=True)
-                return jsonify({
-                    'message': "User role upgraded to Admin.",
-                    'status' : "Success"
-                }), 200
-            #else down grade them to normal users
-            user.update(role=False)
+
+        if not user.role:
+            user.update(role=True)
             return jsonify({
-                'message':"User role downgraded to normal user",
-                'status':'sucess'
+                'message': "User role upgraded to Admin.",
+                'status' : "Success"
             }), 200
-            
-        except:
-            return jsonify({
-                'message':'Role update failed, please try again.',
-                'status'  :'Failed'
-            }), 400
+        #else down grade them to normal users
+        user.update(role=False)
+        return jsonify({
+            'message':"User role downgraded to normal user",
+            'status':'sucess'
+        }), 200

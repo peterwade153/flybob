@@ -33,28 +33,23 @@ class ReservationsView(MethodView):
                 'status':'Failed'
             }), 404
         
-        try:
-            if seats_booked > flight.capacity:
-                return jsonify({
-                    'message': 'Current seating capacity is '+str(flight.capacity),
-                    'status':'Failed'
-                }), 202
-            #update the flight capacity
-            new_flight_capacity = flight.capacity - int(seats_booked)
-            flight.update(capacity=new_flight_capacity)
-
-            book = Reservation(flight_id=flight_id, seats_booked=seats_booked, user_id=current_user)
-            book.save()
-
+        if seats_booked > flight.capacity:
             return jsonify({
-                'message':'Reservation on '+flight.name+' made successfully!',
-                'status' : 'Success'
-            }), 201
-        except:
-            return jsonify({
-                'message': "Flight reservation failed, please try again!",
-                'status':"Failed"
-            }),400
+                'message': 'Current seating capacity is '+str(flight.capacity),
+                'status':'Failed'
+            }), 202
+        #update the flight capacity
+        new_flight_capacity = flight.capacity - int(seats_booked)
+        flight.update(capacity=new_flight_capacity)
+
+        book = Reservation(flight_id=flight_id, seats_booked=seats_booked, user_id=current_user)
+        book.save()
+
+        return jsonify({
+            'message':'Reservation on '+flight.name+' made successfully!',
+            'status' : 'Success'
+        }), 201
+
     
     def get(self, current_user):
 
@@ -101,19 +96,15 @@ class ReservationGetUpdateView(MethodView):
                     'message':" Unknown fields passed",
                     'status':"Failed"
                 }), 400
-        try:
-            for attr, value in data.items():
-                setattr(reservation, attr, value)
-                reservation.save()
-            return jsonify({
-                'message' : 'Reservation updated',
-                'status' : 'Success'
-            }), 200
-        except:
-            return jsonify({
-                'message': "Reservation update failed, please try again!",
-                'status':"Failed"
-            }),400
+        #update
+        for attr, value in data.items():
+            setattr(reservation, attr, value)
+            reservation.save()
+        return jsonify({
+            'message' : 'Reservation updated',
+            'status' : 'Success'
+        }), 200
+
     
     def get(self, current_user, id):
 
