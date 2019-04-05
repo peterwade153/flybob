@@ -8,6 +8,9 @@ Flybob provides a platform which enables users book flights in a quick and effic
 ###  Built with
 python 3.7 and the Flask mirco-framework and uses a postgres database.
 
+### API Documentation
+These Docs ease usage of the Flybob API. https://documenter.getpostman.com/view/3447977/S1EJWfp4
+
 ---
 ### Installation
 Create a virtual environment and activate it.
