@@ -1,0 +1,55 @@
+{
+  "addons": [
+    "heroku-postgresql",
+    "heroku-redis"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "APP_SETTINGS": {
+      "required": true
+    },
+    "CELERY_BROKER_URL": {
+      "required": true
+    },
+    "CELERY_RESULT_BACKEND": {
+      "required": true
+    },
+    "CLOUDINARY_API_KEY": {
+      "required": true
+    },
+    "CLOUDINARY_API_SECRET": {
+      "required": true
+    },
+    "CLOUDINARY_CLOUD_NAME": {
+      "required": true
+    },
+    "MAIL_DEFAULT_SENDER": {
+      "required": true
+    },
+    "MAIL_PASSWORD": {
+      "required": true
+    },
+    "MAIL_USERNAME": {
+      "required": true
+    },
+    "REDIS_URL": {
+      "required": true
+    },
+    "SECRET_KEY": {
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "name": "flybob",
+  "scripts": {
+  },
+  "stack": "heroku-18"
+}
