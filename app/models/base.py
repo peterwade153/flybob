@@ -3,8 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-class BaseMixin(object):
 
+class BaseMixin(object):
     @classmethod
     def get(cls, id):
         return cls.query.get(int(id))
@@ -22,16 +22,16 @@ class BaseMixin(object):
         new = cls(**kwargs)
         db.session.add(new)
         return new
-    
+
     def update(self, **kwargs):
-        for attr , value in kwargs.items():
+        for attr, value in kwargs.items():
             setattr(self, attr, value)
         self.save()
 
     def save(self):
         db.session.add(self)
         db.session.commit()
-    
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()
