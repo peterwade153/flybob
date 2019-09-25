@@ -12,7 +12,32 @@ python 3.7 and the Flask mirco-framework and uses a postgres database.
 These Docs ease usage of the Flybob API. https://documenter.getpostman.com/view/3447977/S1EJWfp4
 
 ---
-### Installation
+### Prerequisites
+A cloudinary account, this will allow the saving images remotely. Please go ahead and create one.
+
+### Installation with Docker.
+- This will require Docker to be already Installed. And its a shorter process compared to the second option.
+
+Clone the repository
+<pre>
+git clone https://github.com/peterwade153/flybob.git
+</pre>
+
+- Start the Docker deamon on the machine if its not running already. 
+
+- Change directory to the folder where the project is cloned and run the command below.
+
+- Updates Environment variable. Create a `.env` file from the `.env-sample` and replace thm with actual varibles.
+
+<pre>
+docker-compose up
+</pre>
+
+Docker will spin up containers and after the API endpoints can be accessed. Via http://localhost:5000/
+
+
+### Installation and API usage without Docker.
+
 Create a virtual environment and activate it.
 <pre>
 $ python3 -m venv fly-env
@@ -37,21 +62,9 @@ CREATE DATABASE flybobdb;
 ### Environment variables
 Set up cloudinary account, its the service used for hosting the user images.
 Ensure redis is installed locally.
-Add these variables replacing then with actual values or use the `.env_sample` as save it as a `.env`
-<pre>
-$ export SECRET_KEY='to something secret'
-$ export APP_SETTINGS='development'
-$ export DATABASE_URL='postgresql://your-username:your-password@localhost/flybobdb'
-$ export CLOUDINARY_CLOUD_NAME = 'cloud-name'
-$ export CLOUDINARY_API_KEY = 'api-key'
-$ export CLOUDINARY_API_SECRET = 'api-secret'
-$ export CELERY_BROKER_URL = 'broker url'
-$ export CELERY_RESULT_BACKEND = 'backend'
-$ export MAIL_PASSWORD = 'enter password here'
-$ export MAIL_DEFAULT_SENDER = 'enter your email here'
-$ export MAIL_USERNAME = 'enter your email here'
-</pre>
-Alterbatively these variables can be placed in a `.env` file which can be added to the root folder.
+
+Create a `.env` and copy variables in the `.env-sample` and replace them with the actual values
+
 
 ### Install all the dependencies
 <pre>
@@ -75,6 +88,9 @@ $ nosetests
 <pre>
 $ python run.py
 </pre>
+
+API endpoints can be accessed. Via http://localhost:5000/
+
 #### Running the flight remainder task via email functionlity 
 To start redis
 <pre>
@@ -106,3 +122,5 @@ POST    |  api/v1/reservations            |        Reserve a seat on a flight
 GET     |  api/v1/reservations            |        View reserved seats on a flight
 GET     |  api/v1/reservations/id         |        Return a reservation
 PUT     |  api/v1/reservations/id         |        Update a reservation details
+
+Developer -- @peterwade153
