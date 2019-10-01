@@ -25,8 +25,8 @@ def encode_auth_token(user_id):
         return f"an error {e} occurred while encoding the token"
 
 
-def token_required(f):
-    @wraps(f)
+def token_required(func):
+    @wraps(func)
     def decorate(*args, **kwargs):
         token = None
         if "Authorization" in request.headers:
@@ -55,13 +55,13 @@ def token_required(f):
         except jwt.InvalidTokenError:
             return jsonify({"message": "Invalid token:"}), 403
 
-        return f(current_user, *args, **kwargs)
+        return func(current_user, *args, **kwargs)
 
     return decorate
 
 
-def admin_required(f):
-    @wraps(f)
+def admin_required(func):
+    @wraps(func)
     def admin_check(*args, **kwargs):
         token = None
         if "Authorization" in request.headers:
@@ -80,6 +80,6 @@ def admin_required(f):
         except Exception as e:
             logging.error(f"An error:-> {e}")
             return jsonify({"message": "Action failed, please try again"}), 400
-        return f(*args, **kwargs)
+        return func(*args, **kwargs)
 
     return admin_check

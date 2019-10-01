@@ -11,6 +11,7 @@ from utils.validation import (
     validate_email,
     validate_password,
     allowed_image_extensions,
+    limit_content_length,
 )
 from utils.auth_token import encode_auth_token, token_required, admin_required
 
@@ -191,7 +192,7 @@ class UserPassportphotoView(MethodView):
     params: image
     """
 
-    decorators = [token_required]
+    decorators = [token_required, limit_content_length]
 
     def post(self, current_user):
 
