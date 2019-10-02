@@ -6,6 +6,7 @@ import jwt
 from functools import wraps
 from flask import request, jsonify
 
+from app import app
 from app.models.user import User
 from app.models.token_blacklist import TokenBlacklist
 
@@ -22,6 +23,7 @@ def encode_auth_token(user_id):
         }
         return jwt.encode(payload, os.getenv("SECRET_KEY"), algorithm="HS256")
     except Exception as e:
+        app.logger.error("Encoding token failed due to:- "+e)
         return f"an error {e} occurred while encoding the token"
 
 
@@ -33,6 +35,7 @@ def token_required(func):
             token = request.headers["Authorization"]
 
         if not token:
+            app.logger.info("Token required")
             return (
                 jsonify(
                     {
@@ -51,8 +54,10 @@ def token_required(func):
             payload = jwt.decode(token, os.getenv("SECRET_KEY"))
             current_user = payload["sub"]
         except jwt.ExpiredSignatureError:
+            app.logger.error("Token expired")
             return jsonify({"message": "Token expired, please login!"}), 403
         except jwt.InvalidTokenError:
+            app.logger.error("Token invalid")
             return jsonify({"message": "Invalid token:"}), 403
 
         return func(current_user, *args, **kwargs)
@@ -73,12 +78,13 @@ def admin_required(func):
 
             user = User.get(id=user_id)
             if not user.role:
+                app.logger.info('Admin access required.')
                 return (
                     jsonify({"message": "Unauthorized action, Admins only"}),
                     401,
                 )
         except Exception as e:
-            logging.error(f"An error:-> {e}")
+            app.logger.error("Admin token invalid or expired")
             return jsonify({"message": "Action failed, please try again"}), 400
         return func(*args, **kwargs)
 
