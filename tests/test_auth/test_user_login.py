@@ -58,14 +58,6 @@ class AuthLoginTestCase(unittest.TestCase):
         )
         self.assertEqual(res.status_code, 400)
 
-    def tests_unregistered_user_login(self):
-        reg = self.app.post(
-            "/api/v1/auth/login",
-            data=json.dumps(self.user_data),
-            content_type="application/json",
-        )
-        self.assertEqual(reg.status_code, 404)
-
     def tests_user_login_with_no_data(self):
         users_data = {}
         reg = self.app.post(
