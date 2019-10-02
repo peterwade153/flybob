@@ -26,7 +26,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["CELERY_RESULT_BACKEND"] = os.getenv("CELERY_RESULT_BACKEND")
 app.config["CELERY_BROKER_URL"] = os.getenv("CELERY_BROKER_URL")
-
+app.config["MAX_CONTENT_LENGTH"] = (
+    1 * 1024 * 1024
+)  # passport photos shouldnot exceed 1MB
 app.config["MAIL_SERVER"] = "smtp.googlemail.com"
 app.config["MAIL_PORT"] = 587
 app.config["MAIL_USE_TLS"] = True
