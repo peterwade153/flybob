@@ -30,20 +30,16 @@ def encode_auth_token(user_id):
 def token_required(func):
     @wraps(func)
     def decorate(*args, **kwargs):
-        token = None
+        
         if "Authorization" in request.headers:
-            token = request.headers["Authorization"]
-
-        if not token:
+            auth_header = request.headers["Authorization"]
+            try:
+                token = auth_header.split(" ")[1]
+            except IndexError:
+                token = auth_header
+        else:
             app.logger.info("Token required")
-            return (
-                jsonify(
-                    {
-                        "message": "Token missing, please login to get an access_token"
-                    }
-                ),
-                403,
-            )
+            return jsonify({"message": "Token missing"}), 403
 
         # check if token is not blacklisted
         is_blacklisted = TokenBlacklist.get_by(token=token)
@@ -58,7 +54,7 @@ def token_required(func):
             return jsonify({"message": "Token expired, please login!"}), 403
         except jwt.InvalidTokenError:
             app.logger.error("Token invalid")
-            return jsonify({"message": "Invalid token:"}), 403
+            return jsonify({"message": "Invalid token"}), 403
 
         return func(current_user, *args, **kwargs)
 
@@ -70,7 +66,11 @@ def admin_required(func):
     def admin_check(*args, **kwargs):
         token = None
         if "Authorization" in request.headers:
-            token = request.headers["Authorization"]
+            auth_header = request.headers["Authorization"]
+            try:
+                token = auth_header.split(" ")[1]
+            except IndexError:
+                token = auth_header
 
         try:
             payload = jwt.decode(token, os.getenv("SECRET_KEY"))

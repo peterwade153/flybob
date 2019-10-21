@@ -1,7 +1,7 @@
 import logging
 from logging.handlers import RotatingFileHandler
 
-from app import app 
+from app import app as application
 
 
 if __name__ == '__main__':
@@ -14,8 +14,8 @@ if __name__ == '__main__':
 
     log_handler.setFormatter(logger_formatter)
 
-    app.logger.setLevel(logging.INFO)
+    application.logger.setLevel(logging.INFO)
 
-    app.logger.addHandler(log_handler)
+    application.logger.addHandler(log_handler)
 
-    app.run(host='0.0.0.0')
+    application.run(host='0.0.0.0')

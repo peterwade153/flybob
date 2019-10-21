@@ -134,7 +134,13 @@ class LoginUserView(MethodView):
 
         user = User.get_by(email=email)
 
-        if user and not check_password_hash(user.password, password):
+        if not user:
+            return(jsonify({
+                'message': "Please sign up to create an account",
+                'status':"Failed"
+            }), 400
+            )
+        if not check_password_hash(user.password, password):
             app.logger.info("Failed login for user with email:- "+email)
             return (
                 jsonify(
