@@ -6,6 +6,7 @@ import jwt
 from functools import wraps
 from flask import request, jsonify
 
+from app import app
 from app.models.user import User
 from app.models.token_blacklist import TokenBlacklist
 
@@ -22,25 +23,23 @@ def encode_auth_token(user_id):
         }
         return jwt.encode(payload, os.getenv("SECRET_KEY"), algorithm="HS256")
     except Exception as e:
+        app.logger.error("Encoding token failed due to:- "+e)
         return f"an error {e} occurred while encoding the token"
 
 
-def token_required(f):
-    @wraps(f)
+def token_required(func):
+    @wraps(func)
     def decorate(*args, **kwargs):
-        token = None
+        
         if "Authorization" in request.headers:
-            token = request.headers["Authorization"]
-
-        if not token:
-            return (
-                jsonify(
-                    {
-                        "message": "Token missing, please login to get an access_token"
-                    }
-                ),
-                403,
-            )
+            auth_header = request.headers["Authorization"]
+            try:
+                token = auth_header.split(" ")[1]
+            except IndexError:
+                token = auth_header
+        else:
+            app.logger.info("Token required")
+            return jsonify({"message": "Token missing"}), 403
 
         # check if token is not blacklisted
         is_blacklisted = TokenBlacklist.get_by(token=token)
@@ -51,21 +50,27 @@ def token_required(f):
             payload = jwt.decode(token, os.getenv("SECRET_KEY"))
             current_user = payload["sub"]
         except jwt.ExpiredSignatureError:
+            app.logger.error("Token expired")
             return jsonify({"message": "Token expired, please login!"}), 403
         except jwt.InvalidTokenError:
-            return jsonify({"message": "Invalid token:"}), 403
+            app.logger.error("Token invalid")
+            return jsonify({"message": "Invalid token"}), 403
 
-        return f(current_user, *args, **kwargs)
+        return func(current_user, *args, **kwargs)
 
     return decorate
 
 
-def admin_required(f):
-    @wraps(f)
+def admin_required(func):
+    @wraps(func)
     def admin_check(*args, **kwargs):
         token = None
         if "Authorization" in request.headers:
-            token = request.headers["Authorization"]
+            auth_header = request.headers["Authorization"]
+            try:
+                token = auth_header.split(" ")[1]
+            except IndexError:
+                token = auth_header
 
         try:
             payload = jwt.decode(token, os.getenv("SECRET_KEY"))
@@ -73,13 +78,14 @@ def admin_required(f):
 
             user = User.get(id=user_id)
             if not user.role:
+                app.logger.info('Admin access required.')
                 return (
                     jsonify({"message": "Unauthorized action, Admins only"}),
                     401,
                 )
         except Exception as e:
-            logging.error(f"An error:-> {e}")
+            app.logger.error("Admin token invalid or expired")
             return jsonify({"message": "Action failed, please try again"}), 400
-        return f(*args, **kwargs)
+        return func(*args, **kwargs)
 
     return admin_check

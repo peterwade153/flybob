@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 from dotenv import load_dotenv
 from celery import Celery
 from flask_mail import Mail
@@ -10,6 +11,7 @@ import cloudinary as Cloud
 
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # load dotenv in the base root
 app_root = os.path.join(os.path.dirname(__file__), "..")
@@ -26,7 +28,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["CELERY_RESULT_BACKEND"] = os.getenv("CELERY_RESULT_BACKEND")
 app.config["CELERY_BROKER_URL"] = os.getenv("CELERY_BROKER_URL")
-
+app.config["MAX_CONTENT_LENGTH"] = (
+    1 * 1024 * 1024
+)  # passport photos shouldnot exceed 1MB
 app.config["MAIL_SERVER"] = "smtp.googlemail.com"
 app.config["MAIL_PORT"] = 587
 app.config["MAIL_USE_TLS"] = True

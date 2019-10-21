@@ -5,12 +5,14 @@ from flask.views import MethodView
 from werkzeug.security import check_password_hash
 import cloudinary.uploader
 
+from app import app
 from app.models.user import User
 from app.models.token_blacklist import TokenBlacklist
 from utils.validation import (
     validate_email,
     validate_password,
     allowed_image_extensions,
+    limit_content_length,
 )
 from utils.auth_token import encode_auth_token, token_required, admin_required
 
@@ -39,9 +41,7 @@ class RegisterUserView(MethodView):
                 400,
             )
 
-        if not validate_email(email=email) or not validate_password(
-            password=password
-        ):
+        if not validate_email(email) or not validate_password(password):
             return (
                 jsonify(
                     {
@@ -55,6 +55,7 @@ class RegisterUserView(MethodView):
 
         user = User.get_by(email=email)
         if user:
+            app.logger.info('User with email '+email+' is already registered')
             return (
                 jsonify(
                     {
@@ -85,7 +86,8 @@ class RegisterUserView(MethodView):
                 201,
             )
 
-        except:
+        except Exception as e:
+            app.logger.error('User registration failed due this:- '+e)    
             return (
                 jsonify(
                     {
@@ -131,21 +133,19 @@ class LoginUserView(MethodView):
             )
 
         user = User.get_by(email=email)
+
         if not user:
-            return (
-                jsonify(
-                    {
-                        "message": "User not registered, please register",
-                        "status": "Failed",
-                    }
-                ),
-                404,
+            return(jsonify({
+                'message': "Please sign up to create an account",
+                'status':"Failed"
+            }), 400
             )
         if not check_password_hash(user.password, password):
+            app.logger.info("Failed login for user with email:- "+email)
             return (
                 jsonify(
                     {
-                        "Message": "An error occured,please try again!",
+                        "Message": "Login failed, please try again!",
                         "Status": "Failed",
                     }
                 ),
@@ -191,7 +191,7 @@ class UserPassportphotoView(MethodView):
     params: image
     """
 
-    decorators = [token_required]
+    decorators = [token_required, limit_content_length]
 
     def post(self, current_user):
 
@@ -204,6 +204,7 @@ class UserPassportphotoView(MethodView):
                 400,
             )
         if not allowed_image_extensions(image_file):
+            app.logger.info('Invalid file upload with wrong extension')
             return (
                 jsonify(
                     {"message": "Only images are allowed", "status": "Failed"}
@@ -225,7 +226,8 @@ class UserPassportphotoView(MethodView):
                     ),
                     200,
                 )
-        except:
+        except Exception as e:
+            app.logger.error("Photo upload failed for user:- "+user.email+" because of "+e)
             return (
                 jsonify(
                     {

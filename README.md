@@ -86,7 +86,7 @@ $ nosetests
 
 ### Running application
 <pre>
-$ python run.py
+$ python application.py
 </pre>
 
 API endpoints can be accessed. Via http://localhost:5000/
@@ -123,4 +123,4 @@ GET     |  api/v1/reservations            |        View reserved seats on a flig
 GET     |  api/v1/reservations/id         |        Return a reservation
 PUT     |  api/v1/reservations/id         |        Update a reservation details
 
-Developer -- @peterwade153
+Developer -- @peterwade153@gmail.com
