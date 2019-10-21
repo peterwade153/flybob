@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 from dotenv import load_dotenv
 from celery import Celery
 from flask_mail import Mail
@@ -10,6 +11,7 @@ import cloudinary as Cloud
 
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # load dotenv in the base root
 app_root = os.path.join(os.path.dirname(__file__), "..")
