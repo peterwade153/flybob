@@ -10,7 +10,7 @@ from flask_mail import Mail
 import cloudinary as Cloud
 
 
-app = Flask(__name__)
+application = app = Flask(__name__)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # load dotenv in the base root
