@@ -9,8 +9,8 @@ dotenv_path = os.path.join(app_root, ".env")
 class Config(object):
     DEBUG = False
     TESTING = False
-    SECRET_KEY = os.getenv("SECRET_KEY")
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+    SECRET_KEY = os.environ.get("SECRET_KEY")
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
 
 
 class ProductionConfig(Config):
@@ -30,7 +30,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     TESTING = True
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.getenv("TEST_DATABASE_URL")
+    SQLALCHEMY_DATABASE_URI = os.environ.get("TEST_DATABASE_URL")
 
 
 app_configuration = {
