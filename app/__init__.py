@@ -22,25 +22,25 @@ load_dotenv(dotenv_path)
 
 from .config import app_configuration
 
-app_environment = os.getenv("APP_SETTINGS")
+app_environment = os.environ.get("APP_SETTINGS")
 app.config.from_object(app_configuration[app_environment])
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
-app.config["CELERY_RESULT_BACKEND"] = os.getenv("CELERY_RESULT_BACKEND")
-app.config["CELERY_BROKER_URL"] = os.getenv("CELERY_BROKER_URL")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["CELERY_RESULT_BACKEND"] = os.environ.get("CELERY_RESULT_BACKEND")
+app.config["CELERY_BROKER_URL"] = os.environ.get("CELERY_BROKER_URL")
 app.config["MAX_CONTENT_LENGTH"] = (
     1 * 1024 * 1024
 )  # passport photos shouldnot exceed 1MB
 app.config["MAIL_SERVER"] = "smtp.googlemail.com"
 app.config["MAIL_PORT"] = 587
 app.config["MAIL_USE_TLS"] = True
-app.config["MAIL_USERNAME"] = os.getenv(
+app.config["MAIL_USERNAME"] = os.environ.get(
     "MAIL_USERNAME"
 )  # enter your email here
-app.config["MAIL_DEFAULT_SENDER"] = os.getenv(
+app.config["MAIL_DEFAULT_SENDER"] = os.environ.get(
     "MAIL_DEFAULT_SENDER"
 )  # enter your email here
-app.config["MAIL_PASSWORD"] = os.getenv(
+app.config["MAIL_PASSWORD"] = os.environ.get(
     "MAIL_PASSWORD"
 )  # enter your password here
 
@@ -50,9 +50,9 @@ mail = Mail(app)
 
 # cloudinary config
 Cloud.config.update = {
-    "cloud_name": os.getenv("CLOUDINARY_CLOUD_NAME"),
-    "api_key": os.getenv("CLOUDINARY_API_KEY"),
-    "api_secret": os.getenv("CLOUDINARY_API_SECRET"),
+    "cloud_name": os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    "api_key": os.environ.get("CLOUDINARY_API_KEY"),
+    "api_secret": os.environ.get("CLOUDINARY_API_SECRET"),
 }
 
 

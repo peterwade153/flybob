@@ -21,7 +21,7 @@ def encode_auth_token(user_id):
             "iat": datetime.datetime.utcnow(),
             "sub": user_id,
         }
-        return jwt.encode(payload, os.getenv("SECRET_KEY"), algorithm="HS256")
+        return jwt.encode(payload, os.environ.get("SECRET_KEY"), algorithm="HS256")
     except Exception as e:
         app.logger.error("Encoding token failed due to:- "+e)
         return f"an error {e} occurred while encoding the token"
@@ -47,7 +47,7 @@ def token_required(func):
             return jsonify({"message": "Invalid token, please login!"}), 403
 
         try:
-            payload = jwt.decode(token, os.getenv("SECRET_KEY"))
+            payload = jwt.decode(token, os.environ.get("SECRET_KEY"))
             current_user = payload["sub"]
         except jwt.ExpiredSignatureError:
             app.logger.error("Token expired")
@@ -73,7 +73,7 @@ def admin_required(func):
                 token = auth_header
 
         try:
-            payload = jwt.decode(token, os.getenv("SECRET_KEY"))
+            payload = jwt.decode(token, os.environ.get("SECRET_KEY"))
             user_id = payload["sub"]
 
             user = User.get(id=user_id)

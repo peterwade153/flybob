@@ -12,7 +12,7 @@ def send_async_mail(app, msg):
 
 def mail_send(subject, recipients, text_body):
     msg = Message(
-        subject, sender=os.getenv("MAIL_DEFAULT_SENDER"), recipients=recipients
+        subject, sender=os.environ.get("MAIL_DEFAULT_SENDER"), recipients=recipients
     )
     msg.body = text_body
     thr = Thread(target=send_async_mail, args=[app, msg])
