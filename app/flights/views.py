@@ -140,7 +140,7 @@ class UpdateDeleteFlightView(MethodView):
 
 class GetAllFlights(MethodView):
     """
-    Fetch all
+    Fetch all flights
     params:
     """
 
@@ -163,8 +163,8 @@ class GetAllFlights(MethodView):
 
 class GetFlight(MethodView):
     """
-    Fetch all
-    params:
+    Fetch a flight
+    params: id
     """
 
     decorators = [token_required]

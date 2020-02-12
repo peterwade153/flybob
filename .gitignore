@@ -105,6 +105,7 @@ ENV/
 # mypy
 .mypy_cache/
 .env
+flybob-env/
 
 celerybeat-schedule.db
 
