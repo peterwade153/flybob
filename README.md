@@ -71,15 +71,15 @@ This will create a virtualenv and activate it. Then install all the required dep
 $ make migrate
 </pre>
 
+### Running application
+<pre>
+$ make start
+</pre>
+
 ### Testing
 Nosetests is used for running tests.
 <pre>
 $ make test
-</pre>
-
-### Running application
-<pre>
-$ make start
 </pre>
 
 API endpoints can be accessed. Via http://localhost:5000/
