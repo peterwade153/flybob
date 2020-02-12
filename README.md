@@ -15,7 +15,7 @@ These Docs ease usage of the Flybob API. https://documenter.getpostman.com/view/
 ### Prerequisites
 A cloudinary account, this will allow the saving images remotely. Please go ahead and create one.
 
-### Installation with Docker.
+## Installation with Docker.
 - This will require Docker to be already Installed. And its a shorter process compared to the second option.
 
 Clone the repository
@@ -36,20 +36,8 @@ docker-compose up
 Docker will spin up containers and after the API endpoints can be accessed. Via http://localhost:5000/
 
 
-### Installation and API usage without Docker.
+## Installation and API set up without Docker.
 
-Create a virtual environment and activate it.
-<pre>
-$ python3 -m venv fly-env
-</pre>
-Change directory into fly-env and clone the repository.
-<pre>
-git clone https://github.com/peterwade153/flybob.git
-</pre>
-To activate the environment.
-<pre>
-$ source bin/activate
-</pre>
 ### Create Database
 Create a database with a `flybobdb`. Assuming postgresql is already installed with `your-user-name` being the user-name created on installation.
 <pre>
@@ -59,34 +47,39 @@ psql postgres -U your-user-name
 CREATE DATABASE flybobdb;
 </pre>
 
+### Clone the project
+Clone the repository.
+<pre>
+git clone https://github.com/peterwade153/flybob.git
+</pre>
+
 ### Environment variables
 Set up cloudinary account, its the service used for hosting the user images.
 Ensure redis is installed locally.
 
-Create a `.env` and copy variables in the `.env-sample` and replace them with the actual values
+In the `flybob` folder create a `.env` file and copy variables in the `.env-sample` and replace them with the actual values.
 
 
-### Install all the dependencies
+### To setup working environment
 <pre>
-$ pip install -r requirements.txt
+$ make init
 </pre>
+This will create a virtualenv and activate it. Then install all the required dependencies.
 
 ### Migrations
 <pre>
-$ python manage.py db init
-$ python manage.py db migrate
-$ python manage.py db upgrade
+$ make migrate
+</pre>
+
+### Running application
+<pre>
+$ make start
 </pre>
 
 ### Testing
 Nosetests is used for running tests.
 <pre>
-$ nosetests
-</pre>
-
-### Running application
-<pre>
-$ python application.py
+$ make test
 </pre>
 
 API endpoints can be accessed. Via http://localhost:5000/
@@ -94,16 +87,14 @@ API endpoints can be accessed. Via http://localhost:5000/
 #### Running the flight remainder task via email functionlity 
 To start redis
 <pre>
-$ redis-server
+$ make redis-start
 </pre>
-To run the celery beat
+
+To run the celery beat and celery worker
 <pre>
-celery -A app.celery beat -l info
+$ make celery
 </pre>
-To run the celery worker
-<pre>
-celery -A app.celery worker -l info
-</pre>
+
 The use a tool like postman to access the endpoints below.
 ### Endpoints
 
