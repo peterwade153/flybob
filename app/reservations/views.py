@@ -84,7 +84,7 @@ class ReservationsView(MethodView):
                 Flight.name == flight,
             )
             for b in booked_flights:
-                seats_booked = +b.seats_booked
+                seats_booked += b.seats_booked
             return (
                 jsonify(
                     {
