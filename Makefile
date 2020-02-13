@@ -8,15 +8,15 @@ init:
 
 migrate:
 	( \
-		python manage.py db migrate; \
-		python manage.py db upgrade; \
+		python3 manage.py db migrate; \
+		python3 manage.py db upgrade; \
 	)
 
 test:
 	nosetests
 
 start:
-	python application.py
+	python3 application.py
 
 redis-start:
 	redis-server
@@ -24,6 +24,6 @@ redis-start:
 celery:
 	( \
 		celery -A app.celery beat -l info; \
-		pelery -A app.celery worker -l info; \
+		celery -A app.celery worker -l info; \
 	)
 
