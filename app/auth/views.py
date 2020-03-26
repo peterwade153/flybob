@@ -2,18 +2,19 @@ import os
 
 from flask import request, jsonify
 from flask.views import MethodView
-from werkzeug.security import check_password_hash
 import cloudinary.uploader
 
 from app import app
 from app.models.user import User
 from app.models.token_blacklist import TokenBlacklist
-from utils.validation import (
-    validate_email,
-    validate_password,
-    allowed_image_extensions,
-    limit_content_length,
+from app.auth.auth_utils import (
+    check_for_all_fields_signup,
+    check_for_all_fields_login,
+    check_email_and_password_valid,
+    check_wrong_password,
+    check_image_is_valid,
 )
+from utils.validation import allowed_image_extensions, limit_content_length
 from utils.auth_token import encode_auth_token, token_required, admin_required
 
 
@@ -30,32 +31,19 @@ class RegisterUserView(MethodView):
         email = data.get("email")
         password = data.get("password")
 
-        if not all([username, email, password]):
-            return (
-                jsonify(
-                    {
-                        "message": "All fields username, email or password are required",
-                        "status": "Failed",
-                    }
-                ),
-                400,
-            )
+        fields_res = check_for_all_fields_signup(username, email, password)
+        if fields_res:
+            return fields_res
 
-        if not validate_email(email) or not validate_password(password):
-            return (
-                jsonify(
-                    {
-                        "message": "Please enter a valid email and password "
-                        "not less than 8 charaters",
-                        "status": "Failed",
-                    }
-                ),
-                400,
-            )
+        invalid_res = check_email_and_password_valid(email, password)
+        if invalid_res:
+            return invalid_res
 
         user = User.get_by(email=email)
         if user:
-            app.logger.info('User with email '+email+' is already registered')
+            app.logger.info(
+                "User with email " + email + " is already registered"
+            )
             return (
                 jsonify(
                     {
@@ -87,7 +75,7 @@ class RegisterUserView(MethodView):
             )
 
         except Exception as e:
-            app.logger.error('User registration failed due this:- '+e)    
+            app.logger.error("User registration failed due this:- " + e)
             return (
                 jsonify(
                     {
@@ -110,47 +98,32 @@ class LoginUserView(MethodView):
         email = data.get("email")
         password = data.get("password")
 
-        if not all([email, password]):
+        fields_res = check_for_all_fields_login(email, password)
+        if fields_res:
+            return fields_res
+
+        invalid_res = check_email_and_password_valid(email, password)
+        if invalid_res:
+            return invalid_res
+
+        user = User.get_by(email=email)
+
+        if not user:
             return (
                 jsonify(
                     {
-                        "message": "Username and password are required",
+                        "message": "Please sign up to create an account",
                         "status": "Failed",
                     }
                 ),
                 400,
             )
-        if not validate_password(password) or not validate_email(email):
-            return (
-                jsonify(
-                    {
-                        "message": "Password should have 8 or more characters"
-                        "and email should be valid",
-                        "status ": "Failed",
-                    }
-                ),
-                400,
-            )
 
-        user = User.get_by(email=email)
+        check_password_res = check_wrong_password(user.password, password)
+        if check_password_res:
+            app.logger.info("Failed login for user with email:- " + email)
+            return check_password_res
 
-        if not user:
-            return(jsonify({
-                'message': "Please sign up to create an account",
-                'status':"Failed"
-            }), 400
-            )
-        if not check_password_hash(user.password, password):
-            app.logger.info("Failed login for user with email:- "+email)
-            return (
-                jsonify(
-                    {
-                        "Message": "Login failed, please try again!",
-                        "Status": "Failed",
-                    }
-                ),
-                401,
-            )
         # generate  access token
         access_token = encode_auth_token(user_id=user.id)
         return (
@@ -193,24 +166,21 @@ class UserPassportphotoView(MethodView):
 
     decorators = [token_required, limit_content_length]
 
-    def post(self, current_user):
-
-        image_file = request.files["image"]
-        if not image_file:
+    def post(self, current_user):  
+        if 'file' not in request.files:
             return (
                 jsonify(
                     {"message": "No image was uploaded", "status": "Failed"}
                 ),
                 400,
             )
-        if not allowed_image_extensions(image_file):
-            app.logger.info('Invalid file upload with wrong extension')
-            return (
-                jsonify(
-                    {"message": "Only images are allowed", "status": "Failed"}
-                ),
-                400,
-            )
+        image_file = request.files["file"]
+
+        image_res = check_image_is_valid(image_file)
+        if image_res:
+            app.logger.info("Invalid file upload with wrong extension")
+            return image_res
+
         user = User.get(id=current_user)
         try:
             upload_res = cloudinary.uploader.upload(image_file)
@@ -227,7 +197,12 @@ class UserPassportphotoView(MethodView):
                     200,
                 )
         except Exception as e:
-            app.logger.error("Photo upload failed for user:- "+user.email+" because of "+e)
+            app.logger.error(
+                "Photo upload failed for user:- "
+                + user.email
+                + " because of "
+                + e
+            )
             return (
                 jsonify(
                     {
