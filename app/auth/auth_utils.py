@@ -85,7 +85,6 @@ def check_image_is_valid(image_file):
     params: image_file
     """
     if not allowed_image_extensions(image_file):
-        app.logger.info("Invalid file upload with wrong extension")
         return (
             jsonify(
                 {"message": "Only images are allowed", "status": "Failed"}

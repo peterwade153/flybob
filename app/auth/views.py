@@ -166,19 +166,19 @@ class UserPassportphotoView(MethodView):
 
     decorators = [token_required, limit_content_length]
 
-    def post(self, current_user):
-
-        image_file = request.files["image"]
-        if not image_file:
+    def post(self, current_user):  
+        if 'file' not in request.files:
             return (
                 jsonify(
                     {"message": "No image was uploaded", "status": "Failed"}
                 ),
                 400,
             )
+        image_file = request.files["file"]
 
         image_res = check_image_is_valid(image_file)
         if image_res:
+            app.logger.info("Invalid file upload with wrong extension")
             return image_res
 
         user = User.get(id=current_user)
