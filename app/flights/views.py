@@ -4,6 +4,7 @@ from flask import request, jsonify
 from flask.views import MethodView
 
 from app.models.flights import Flight
+from app.flights.flight_utils import check_all_fields_flight_register
 from utils.auth_token import token_required, admin_required
 
 
@@ -18,6 +19,11 @@ class RegisterFlightView(MethodView):
     def post(self, current_user):
 
         data = request.get_json()
+
+        fields_res = check_all_fields_flight_register(data)
+        if fields_res:
+            return fields_res
+
         name = data.get("name")
         origin = data.get("origin")
         aircraft = data.get("aircraft")
@@ -27,30 +33,6 @@ class RegisterFlightView(MethodView):
         capacity = data.get("capacity")
         duration = data.get("duration")
         status = data.get("status")
-
-        if not all(
-            [
-                name,
-                origin,
-                destination,
-                departure,
-                arrive,
-                duration,
-                status,
-                aircraft,
-                capacity,
-            ]
-        ):
-            return (
-                jsonify(
-                    {
-                        "message": "All fields name, origin, destination,"
-                        "departure, arrive, duration, status",
-                        "status": "Failed",
-                    }
-                ),
-                400,
-            )
 
         new_flight = Flight(
             name=name,
