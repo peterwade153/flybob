@@ -4,6 +4,7 @@ from flask import request, jsonify
 from flask.views import MethodView
 
 from app.models.flights import Flight
+from app.flights.flight_utils import check_all_fields_flight_register
 from utils.auth_token import token_required, admin_required
 
 
@@ -18,50 +19,21 @@ class RegisterFlightView(MethodView):
     def post(self, current_user):
 
         data = request.get_json()
-        name = data.get("name")
-        origin = data.get("origin")
-        aircraft = data.get("aircraft")
-        destination = data.get("destination")
-        departure = data.get("departure")
-        arrive = data.get("arrive")
-        capacity = data.get("capacity")
-        duration = data.get("duration")
-        status = data.get("status")
 
-        if not all(
-            [
-                name,
-                origin,
-                destination,
-                departure,
-                arrive,
-                duration,
-                status,
-                aircraft,
-                capacity,
-            ]
-        ):
-            return (
-                jsonify(
-                    {
-                        "message": "All fields name, origin, destination,"
-                        "departure, arrive, duration, status",
-                        "status": "Failed",
-                    }
-                ),
-                400,
-            )
+        fields_res = check_all_fields_flight_register(data)
+        if fields_res:
+            return fields_res
 
         new_flight = Flight(
-            name=name,
-            origin=origin,
-            destination=destination,
-            departure=departure,
-            arrive=arrive,
-            duration=duration,
-            capacity=capacity,
-            aircraft=aircraft,
-            status=status,
+            name=data.get("name"),
+            origin=data.get("origin"),
+            destination=data.get("destination"),
+            departure=data.get("departure"),
+            arrive=data.get("arrive"),
+            duration=data.get("duration"),
+            capacity=data.get("capacity"),
+            aircraft=data.get("aircraft"),
+            status=data.get("status"),
             created_by=current_user,
         )
         new_flight.save()
@@ -69,9 +41,9 @@ class RegisterFlightView(MethodView):
             jsonify(
                 {
                     "message": "Flight "
-                    + name
+                    + data.get("name")
                     + " to "
-                    + destination
+                    + data.get("destination")
                     + " registered.",
                     "status": " Success",
                 }
