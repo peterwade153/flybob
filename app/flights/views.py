@@ -5,6 +5,7 @@ from flask.views import MethodView
 
 from app.models.flights import Flight
 from app.flights.flight_utils import check_all_fields_flight_register, check_flight_fields_update
+
 from utils.auth_token import token_required, admin_required
 
 

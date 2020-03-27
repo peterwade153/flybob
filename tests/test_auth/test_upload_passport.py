@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import patch, Mock
+from werkzeug.datastructures import FileStorage
 import io
 import json
 

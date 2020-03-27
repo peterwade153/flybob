@@ -59,3 +59,4 @@ def check_flight_fields_update(data):
                 ),
                 400,
             )
+
