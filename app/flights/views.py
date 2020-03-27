@@ -4,7 +4,7 @@ from flask import request, jsonify
 from flask.views import MethodView
 
 from app.models.flights import Flight
-from app.flights.flight_utils import check_all_fields_flight_register
+from app.flights.flight_utils import check_all_fields_flight_register, check_flight_fields_update
 from utils.auth_token import token_required, admin_required
 
 
@@ -61,7 +61,6 @@ class UpdateDeleteFlightView(MethodView):
     decorators = [token_required, admin_required]
 
     def put(self, current_user, id):
-
         data = request.get_json()
         flight = Flight.get_by(id=id)
         if not flight:
@@ -69,28 +68,10 @@ class UpdateDeleteFlightView(MethodView):
                 jsonify({"message": "Flight not found", "status": "Failed"}),
                 404,
             )
-        fields = [
-            "name",
-            "origin",
-            "destination",
-            "departure",
-            "arrive",
-            "duration",
-            "status",
-            "aircraft",
-            "capacity",
-        ]
-        for field in data.keys():
-            if field not in fields:
-                return (
-                    jsonify(
-                        {
-                            "message": " Unknown fields passed",
-                            "status": "Failed",
-                        }
-                    ),
-                    400,
-                )
+        fields_res = check_flight_fields_update(data)
+        if fields_res:
+            return fields_res
+
         # update
         for attr, value in data.items():
             setattr(flight, attr, value)
