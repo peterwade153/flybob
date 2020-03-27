@@ -24,26 +24,16 @@ class RegisterFlightView(MethodView):
         if fields_res:
             return fields_res
 
-        name = data.get("name")
-        origin = data.get("origin")
-        aircraft = data.get("aircraft")
-        destination = data.get("destination")
-        departure = data.get("departure")
-        arrive = data.get("arrive")
-        capacity = data.get("capacity")
-        duration = data.get("duration")
-        status = data.get("status")
-
         new_flight = Flight(
-            name=name,
-            origin=origin,
-            destination=destination,
-            departure=departure,
-            arrive=arrive,
-            duration=duration,
-            capacity=capacity,
-            aircraft=aircraft,
-            status=status,
+            name=data.get("name"),
+            origin=data.get("origin"),
+            destination=data.get("destination"),
+            departure=data.get("departure"),
+            arrive=data.get("arrive"),
+            duration=data.get("duration"),
+            capacity=data.get("capacity"),
+            aircraft=data.get("aircraft"),
+            status=data.get("status"),
             created_by=current_user,
         )
         new_flight.save()
@@ -51,9 +41,9 @@ class RegisterFlightView(MethodView):
             jsonify(
                 {
                     "message": "Flight "
-                    + name
+                    + data.get("name")
                     + " to "
-                    + destination
+                    + data.get("destination")
                     + " registered.",
                     "status": " Success",
                 }
